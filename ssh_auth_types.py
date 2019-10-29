@@ -5,13 +5,6 @@ import queue
 import logging
 from enum import Enum
 
-class SSHError(Enum):
-	SUCCESS = 0
-	CONNECTION_REFUSED = 1
-	CONNECTION_TIMEOUT = 2
-	GAIERROR = 3
-	INVALID_BANNER = 4
-
 # Possible types: ['publickey', 'password', 'keyboard-interactive', 'hostbased', 'gssapi-keyex', 'gssapi-with-mic']
 # also gssapi?
 
@@ -58,15 +51,15 @@ class SSHAuthTypes:
 			try:
 				s.connect(host)
 			except socket.timeout as err:
-				self.data[host[0]]["auth_types"] = SSHError.CONNECTION_TIMEOUT
+				self.data[host[0]]["auth_types"] = "SSHError.CONNECTION_TIMEOUT"
 				self.q.task_done()
 				continue
 			except socket.gaierror as err:
-				self.data[host[0]]["auth_types"] = SSHError.GAIERROR
+				self.data[host[0]]["auth_types"] = "SSHError.GAIERROR"
 				self.q.task_done()
 				continue
 			except ConnectionRefusedError as err:
-				self.data[host[0]]["auth_types"] = SSHError.CONNECTION_REFUSED
+				self.data[host[0]]["auth_types"] = "SSHError.CONNECTION_REFUSED"
 				self.q.task_done()
 				continue
 			
@@ -75,7 +68,7 @@ class SSHAuthTypes:
 				t = paramiko.Transport(s)
 				t.connect()
 			except (paramiko.ssh_exception.SSHException, EOFError) as err:
-				self.data[host[0]]["auth_types"] = SSHError.INVALID_BANNER
+				self.data[host[0]]["auth_types"] = "SSHError.INVALID_BANNER"
 				self.q.task_done()
 				continue
 
