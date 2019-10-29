@@ -42,6 +42,5 @@ class SSHCiphersThreaded:
 				ciphers = "ERROR"
 			
 			self.data[host[0]]["ciphers"] = ciphers
-			print(ciphers)
 			
 			self.q.task_done()
