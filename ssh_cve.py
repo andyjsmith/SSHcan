@@ -20,9 +20,7 @@ class SSHCVE:
 	def get_cve(self, version: SSHVersion, min_score=0):
 		cves = []
 		for cve in self.cve_data:
-			if cve["latest_version"] >= version and cve["earliest_version"] <= version and float(cve["score"] >= min_score):
+			if cve["latest_version"] >= version and cve["earliest_version"] <= version and float(cve["score"]) >= min_score:
 				cves.append(cve["cve"])
 		
 		return cves
-
-# SSHCVE("SSH_CVE.csv")
