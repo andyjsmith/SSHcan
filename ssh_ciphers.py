@@ -10,6 +10,7 @@ class SSHCiphers:
 		
 	def __connect(self):
 		conn = socket.create_connection((self.ip_address, self.port),5)
+		conn.settimeout(2.0)
 		banner = conn.recv(50).split(b'\n')[0]
 		conn.send(b'SSH-2.0-OpenSSH_7.9p1\r\n')
 		ciphers = conn.recv(2048)
