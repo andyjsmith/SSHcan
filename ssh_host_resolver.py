@@ -1,7 +1,6 @@
 import socket
 import threading
 import queue
-import logging
 
 class SSHHostResolver:
 	def __init__(self, num_threads: int, data: dict):
