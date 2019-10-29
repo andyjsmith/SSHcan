@@ -5,6 +5,7 @@ from ssh_auth_types import SSHAuthTypes
 from ssh_cve import SSHCVE
 from ssh_version import SSHVersion
 from ssh_host_resolver import SSHHostResolver
+from ssh_ciphers_threaded import SSHCiphersThreaded
 import json
 import socket
 import sys
@@ -16,15 +17,11 @@ data = parser.parse()
 print("Resolving IP addresses")
 host_resolver = SSHHostResolver(5, data)
 data = host_resolver.run()
-sys.exit(0)
 
 # Parse SSH ciphers
 print("Parsing SSH ciphers")
-for host, props in data.items():
-	try:
-		data[host]["ciphers"] = SSHCiphers(host, props["port"]).to_dict()
-	except socket.timeout as err:
-		data[host]["ciphers"] = "ERROR"
+threaded_ciphers = SSHCiphersThreaded(5, data)
+data = threaded_ciphers.run()
 
 # Parse SSH banner
 print("Parsing SSH banner")
