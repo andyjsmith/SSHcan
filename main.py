@@ -10,17 +10,19 @@ import json
 import socket
 import sys
 
+NUM_THREADS = 5
+
 parser = SSHMasscanParser("masscanoutput.txt")
 data = parser.parse()
 
 # Resolve IP addresses
 print("Resolving IP addresses")
-host_resolver = SSHHostResolver(5, data)
+host_resolver = SSHHostResolver(NUM_THREADS, data)
 data = host_resolver.run()
 
 # Parse SSH ciphers
 print("Parsing SSH ciphers")
-threaded_ciphers = SSHCiphersThreaded(5, data)
+threaded_ciphers = SSHCiphersThreaded(NUM_THREADS, data)
 data = threaded_ciphers.run()
 
 # Parse SSH banner
@@ -35,7 +37,7 @@ for host, props in data.items():
 
 # Get auth types
 print("Getting auth types")
-auth_types_parallel = SSHAuthTypes(5, data)
+auth_types_parallel = SSHAuthTypes(NUM_THREADS, data)
 data = auth_types_parallel.run()
 
 print(json.dumps(data))
