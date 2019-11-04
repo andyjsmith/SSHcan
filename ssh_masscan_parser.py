@@ -9,6 +9,10 @@ class SSHMasscanParser:
 				if not line.startswith("banner"):
 					continue
 
+				# Ignore connection refused that were mistaken as banners
+				if "connection refused" in line:
+					continue
+
 				cols = line.split(" ")
 
 				self.data[cols[3]] = {
