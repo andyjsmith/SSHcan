@@ -22,8 +22,3 @@ class SSHMasscanParser:
 				}
 
 		return self.data
-
-# Sample -oL outputs
-# theoretically only need parse banner responses, don't care about the "open" rows
-
-# port state, protocol, port number, ip address, posix timestamp
