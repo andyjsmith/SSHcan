@@ -1,5 +1,6 @@
 from ssh_version import SSHVersion
 
+
 class SSHBanner:
 	def __init__(self, banner: str):
 		self.banner = banner
@@ -12,7 +13,7 @@ class SSHBanner:
 	def os_string(self):
 		if len(self.banner.split(" ")) <= 1:
 			return None
-			
+
 		return self.banner.split(" ")[1]
 
 	@property
@@ -26,15 +27,15 @@ class SSHBanner:
 	def version(self):
 		index = self.version_string.index("-")
 		index = self.version_string.index("-", index + 1)
-		return self.version_string[index+1:]
+		return self.version_string[index + 1:]
 
 	@property
 	def version_number(self):
 		if not self.is_openssh:
 			return None
-		
+
 		index = self.version.index("_")
-		return self.version[index+1:]
+		return self.version[index + 1:]
 
 	@property
 	def version_major(self):
@@ -61,19 +62,33 @@ class SSHBanner:
 	def version_patch(self):
 		if not self.is_openssh:
 			return None
-		
+
 		return SSHVersion(self.version_number).patch
 
 	@property
 	def os_version(self):
 		if self.os_string == None:
 			return None
-		
+
 		return self.os_string.split("-")[1]
 
 	@property
 	def is_openssh(self):
 		return "openssh" in self.version_string.lower()
+
+	@property
+	def software(self):
+		try:
+			return self.version[:self.version.rindex("_")].split("-")[0]
+		except IndexError as err:
+			return None
+
+	@property
+	def ssh_version(self):
+		try:
+			return self.version_string.split("-")[1]
+		except IndexError as err:
+			return None
 
 	def to_dict(self):
 		return {
@@ -81,6 +96,8 @@ class SSHBanner:
 			"os_string": self.os_string,
 			"operating_system": self.operating_system,
 			"os_version": self.os_version,
+			"ssh_version": self.ssh_version,
+			"software": self.software,
 			"version": self.version,
 			"version_number": self.version_number,
 			"version_major": self.version_major,
