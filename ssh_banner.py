@@ -76,13 +76,18 @@ class SSHBanner:
 	def is_openssh(self):
 		return "openssh" in self.version_string.lower()
 
+	# SSH software, normally OpenSSH but also dropbear, Cisco, etc.
 	@property
 	def software(self):
 		try:
-			return self.version[:self.version.rindex("_")].split("-")[0]
+			if "_" in self.version:
+				return self.version[:self.version.rindex("_")].split("-")[0]
+			else:
+				return self.version.split("-")[0]
 		except IndexError as err:
 			return None
 
+	# SSH version, normally 2.0
 	@property
 	def ssh_version(self):
 		try:
