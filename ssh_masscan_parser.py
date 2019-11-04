@@ -6,14 +6,15 @@ class SSHMasscanParser:
 	def parse(self):
 		with open(self.filename, "r") as fp:
 			for line in fp:
+				# Only parse banner lines
 				if not line.startswith("banner"):
 					continue
 
-				# Ignore connection refused that were mistaken as banners
-				if "connection refused" in line:
-					continue
-
 				cols = line.split(" ")
+
+				# Only include SSH banner responses (connection refused; Microsoft FTP)
+				if cols[5].lower() != "ssh":
+					continue
 
 				self.data[cols[3]] = {
 					"port": int(cols[2]),
