@@ -1,6 +1,7 @@
 from ssh_ciphers import SSHCiphers
 import threading
 import queue
+import progressbar
 import socket
 
 class SSHCiphersThreaded:
@@ -9,6 +10,9 @@ class SSHCiphersThreaded:
 		self.data = data
 		self.threads = []
 		self.q = queue.Queue()
+		self.count = len(data)
+		self.progress = progressbar.ProgressBar(max_value=self.count)
+		self.progress.update(0)
 
 		for host, props in data.items():
 			self.q.put_nowait((host, props["port"]))
@@ -28,6 +32,7 @@ class SSHCiphersThreaded:
 		for t in self.threads:
 			t.join()
 
+		self.progress.finish()
 		return self.data
 
 	def __resolver_worker(self):
@@ -44,3 +49,5 @@ class SSHCiphersThreaded:
 			self.data[host[0]]["ciphers"] = ciphers
 			
 			self.q.task_done()
+			if (self.count - self.q.qsize()) % 10 == 0:
+				self.progress.update(self.count - self.q.qsize())
