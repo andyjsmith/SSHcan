@@ -41,7 +41,8 @@ class SSHBanner:
 
 		# Parse Debian OS version
 		if "debian" in self.os_string.lower() or "raspbian" in self.os_string.lower():
-			return re.search(r'\d+', self.os_string.split("-")[1]).group()
+			match = re.search(r'\d+', self.os_string.split("-")[1])
+			if match is not None: return match.group()
 		
 		return self.os_string.split("-")[1]
 
