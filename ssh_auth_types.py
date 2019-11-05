@@ -2,6 +2,7 @@ import paramiko
 import socket
 import threading
 import queue
+import progressbar
 import logging
 from enum import Enum
 
@@ -18,6 +19,9 @@ class SSHAuthTypes:
 		self.data = data
 		self.threads = []
 		self.q = queue.Queue()
+		self.count = len(data)
+		self.progress = progressbar.ProgressBar(max_value=self.count)
+		self.progress.update(0)
 
 		for host, props in data.items():
 			self.q.put_nowait((host, props["port"]))
@@ -37,6 +41,7 @@ class SSHAuthTypes:
 		for t in self.threads:
 			t.join()
 
+		self.progress.finish()
 		return self.data
 
 	def __ssh_worker(self):
@@ -71,11 +76,21 @@ class SSHAuthTypes:
 				self.data[host[0]]["auth_types"] = "SSHError.INVALID_BANNER"
 				self.q.task_done()
 				continue
+			except ConnectionAbortedError as err:
+				self.data[host[0]]["auth_types"] = "SSHError.CONNECTION_ABORTED"
+				self.q.task_done()
+				continue
 
 			# Try authentication to get allowed SSH auth types
 			try:
 				t.auth_none('')
 			except paramiko.BadAuthenticationType as err:
 				self.data[host[0]]["auth_types"] = err.allowed_types
+			except (ConnectionResetError, ConnectionAbortedError) as err:
+				self.data[host[0]]["auth_types"] = "SSHError.CONNECTION_EXCEPTION"
+			except paramiko.ssh_exception.AuthenticationException as err:
+				self.data[host[0]]["auth_types"] = "SSHError.AUTHENTICATION_EXCEPTION"
 			
 			self.q.task_done()
+			if (self.count - self.q.qsize()) % 10 == 0:
+				self.progress.update(self.count - self.q.qsize())
