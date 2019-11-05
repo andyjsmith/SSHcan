@@ -8,16 +8,27 @@ from ssh_host_resolver import SSHHostResolver
 from ssh_ciphers_threaded import SSHCiphersThreaded
 import json
 import socket
+import gzip
 import sys
+import argparse
 
-NUM_THREADS = 5
+# Command line arguments
+parser = argparse.ArgumentParser(description="SSHcan IPv4 address space scanner and statistics")
+parser.add_argument("masscan_output", help="Masscan output file to read", type=str)
+parser.add_argument("--threads", help="Number of threads to use for parsing (x200 for IP resolution)", default=8, type=int)
 
-parser = SSHMasscanParser("masscanoutput.txt")
+args = parser.parse_args()
+
+NUM_THREADS = args.threads
+
+# Parse Masscan output file
+print("Parsing Masscan output")
+parser = SSHMasscanParser(args.masscan_output)
 data = parser.parse()
 
 # Resolve IP addresses
 print("Resolving IP addresses")
-host_resolver = SSHHostResolver(NUM_THREADS, data)
+host_resolver = SSHHostResolver(NUM_THREADS * 200, data)
 data = host_resolver.run()
 
 # Parse SSH ciphers
@@ -40,4 +51,7 @@ print("Getting auth types")
 auth_types_parallel = SSHAuthTypes(NUM_THREADS, data)
 data = auth_types_parallel.run()
 
-print(json.dumps(data))
+# print(json.dumps(data))
+
+compressed_data = gzip.compress(json.dumps(data).encode("utf-8"))
+print(compressed_data)
