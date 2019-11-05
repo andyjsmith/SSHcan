@@ -49,7 +49,10 @@ class SSHBanner:
 	@property
 	def version(self):
 		index = self.version_string.index("-")
-		index = self.version_string.index("-", index + 1)
+		
+		if "-" in self.version_string[index + 1:]:
+			index = self.version_string.index("-", index + 1)
+		
 		return self.version_string[index + 1:]
 
 	@property
