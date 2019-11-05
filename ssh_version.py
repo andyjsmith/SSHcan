@@ -1,3 +1,5 @@
+import re
+
 class SSHVersion:
 	def __init__(self, version_number: str):
 		self.version_number = version_number
@@ -13,7 +15,19 @@ class SSHVersion:
 		if len(ver_num.split(".")) == 0:
 			return None
 		
-		return int(ver_num.split(".")[0])
+		ver_num = ver_num.split(".")[0]
+		
+		if "_" in ver_num:
+			ver_num = ver_num.split("_")[0]
+		if "-" in ver_num:
+			ver_num = ver_num.split("-")[0]
+
+		# Remove any leftover non-numeric characters
+		ver_num = re.sub("[^0-9]", "", ver_num)
+
+		if ver_num == "": return 0
+		
+		return int(ver_num)
 
 	@property
 	def minor(self):
@@ -26,7 +40,19 @@ class SSHVersion:
 		if len(ver_num.split(".")) <= 1:
 			return 0
 		
-		return int(ver_num.split(".")[1])
+		ver_num = ver_num.split(".")[1]
+		
+		if "_" in ver_num:
+			ver_num = ver_num.split("_")[0]
+		if "-" in ver_num:
+			ver_num = ver_num.split("-")[0]
+
+		# Remove any leftover non-numeric characters
+		ver_num = re.sub("[^0-9]", "", ver_num)
+
+		if ver_num == "": return 0
+		
+		return int(ver_num)
 
 	@property
 	def revision(self):
@@ -38,8 +64,20 @@ class SSHVersion:
 
 		if len(ver_num.split(".")) <= 2:
 			return 0
+
+		ver_num = ver_num.split(".")[2]
 		
-		return int(ver_num.split(".")[2])
+		if "_" in ver_num:
+			ver_num = ver_num.split("_")[0]
+		if "-" in ver_num:
+			ver_num = ver_num.split("-")[0]
+
+		# Remove any leftover non-numeric characters
+		ver_num = re.sub("[^0-9]", "", ver_num)
+		
+		if ver_num == "": return 0
+
+		return int(ver_num)
 
 	@property
 	def patch(self):
@@ -47,7 +85,19 @@ class SSHVersion:
 			return 0
 		
 		index = self.version_number.index("p")
-		return int(self.version_number[index+1:])
+		patch = self.version_number[index+1:]
+
+		if "_" in patch:
+			patch = patch.split("_")[0]
+		if "-" in patch:
+			patch = patch.split("-")[0]
+
+		# Remove any leftover non-numeric characters
+		patch = re.sub("[^0-9]", "", patch)
+
+		if patch == "": return 0
+		
+		return int(patch)
 
 	@property
 	def version(self):
