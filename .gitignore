@@ -149,3 +149,4 @@ pyvenv.cfg
 *.xlsx
 *.txt
 *.mmdb
+*.json
