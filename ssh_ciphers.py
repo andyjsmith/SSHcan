@@ -24,7 +24,7 @@ class SSHCiphers:
 
 		try:
 			conn = socket.create_connection((self.ip_address, self.port),5)
-		except (ConnectionRefusedError, ConnectionResetError) as err:
+		except (ConnectionRefusedError, ConnectionResetError, OSError) as err:
 			return
 
 		conn.settimeout(2.0)
