@@ -54,7 +54,7 @@ for host, props in data.items():
 geoip_progress.finish()
 
 # Get ciphers
-print("4/7: Parsing SSH ciphers")
+print("4/7: Getting SSH ciphers")
 threaded_ciphers = SSHCiphersThreaded(NUM_THREADS, data)
 data = threaded_ciphers.run()
 
