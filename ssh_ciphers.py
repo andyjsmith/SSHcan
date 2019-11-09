@@ -28,9 +28,15 @@ class SSHCiphers:
 			return
 
 		conn.settimeout(2.0)
-		banner = conn.recv(50).split(b'\n')[0]
-		conn.send(b'SSH-2.0-OpenSSH_7.9p1\r\n')
-		ciphers = conn.recv(2048)
+
+		try:
+			banner = conn.recv(50).split(b'\n')[0]
+			conn.send(b'SSH-2.0-OpenSSH_7.9p1\r\n')
+			ciphers = conn.recv(2048)
+		except ConnectionResetError as err:
+			conn.close()
+			return
+		
 		conn.close()
 		self.raw_ciphers = ciphers.split(b"\x00\x00\x00\x15")[0].decode("latin1")
 		self.raw_banner = banner
