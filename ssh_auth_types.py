@@ -6,9 +6,6 @@ import progressbar
 import logging
 from enum import Enum
 
-# Possible types: ['publickey', 'password', 'keyboard-interactive', 'hostbased', 'gssapi-keyex', 'gssapi-with-mic']
-# also gssapi?
-
 class SSHAuthTypes:
 
 	# Don't log exceptions from Paramiko transport threads, already handled in worker
@@ -121,6 +118,8 @@ class SSHAuthTypes:
 				self.data[host[0]]["auth_types"] = "error.EXCEPTION"
 			except EOFError:
 				self.data[host[0]]["auth_types"] = "error.EOF"
+			except paramiko.ssh_exception.SSHException:
+				self.data[host[0]]["auth_types"] = "error.TIMEOUT"
 			
 			s.close()
 			t.close()
