@@ -8,14 +8,13 @@ from ssh_host_resolver import SSHHostResolver
 from ssh_ciphers_threaded import SSHCiphersThreaded
 import json
 import socket
-import gzip
-import sys
 import argparse
 import progressbar
 
 # Command line arguments
 parser = argparse.ArgumentParser(description="SSHcan IPv4 address space scanner and statistics")
-parser.add_argument("masscan_output", help="Masscan output file to read", type=str)
+parser.add_argument("input_file", help="Masscan output file to read", type=str)
+parser.add_argument("output_file", help="File to save JSON output", type=str)
 parser.add_argument("--threads", help="Number of threads to use for parsing (x10 for IP resolution)", default=256, type=int)
 
 args = parser.parse_args()
@@ -24,7 +23,7 @@ NUM_THREADS = args.threads
 
 # Parse Masscan output file
 print("Parsing Masscan output")
-parser = SSHMasscanParser(args.masscan_output)
+parser = SSHMasscanParser(args.input_file)
 data = parser.parse()
 
 # Resolve IP addresses
@@ -68,7 +67,5 @@ for host, props in data.items():
 
 cve_progress.finish()
 
-# print(json.dumps(data))
-
-compressed_data = gzip.compress(json.dumps(data).encode("utf-8"))
-print(compressed_data)
+# Save to output file
+json.dump(data, open(args.output_file, "w"))
