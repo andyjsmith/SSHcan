@@ -43,11 +43,10 @@ class SSHCiphersThreaded:
 			
 			try:
 				ciphers = SSHCiphers(host[0], host[1]).to_dict()
-			except socket.timeout as err:
+			except socket.timeout:
 				ciphers = "ERROR"
 			
 			self.data[host[0]]["ciphers"] = ciphers
 			
 			self.q.task_done()
-			if (self.count - self.q.qsize()) % 10 == 0:
-				self.progress.update(self.count - self.q.qsize())
+			self.progress.update(self.count - self.q.qsize())
