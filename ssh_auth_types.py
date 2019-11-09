@@ -27,7 +27,7 @@ class SSHAuthTypes:
 			self.q.put_nowait((host, props["port"]))
 
 	def run(self):
-		for i in range(self.num_threads):
+		for _ in range(self.num_threads):
 			t = threading.Thread(target=self.__ssh_worker)
 			t.start()
 			self.threads.append(t)
@@ -55,27 +55,27 @@ class SSHAuthTypes:
 			# Connect over TCP socket
 			try:
 				s.connect(host)
-			except socket.timeout as err:
+			except socket.timeout:
 				s.close()
 				self.data[host[0]]["auth_types"] = "error.TIMEOUT"
 				self.q.task_done()
 				continue
-			except socket.gaierror as err:
+			except socket.gaierror:
 				s.close()
 				self.data[host[0]]["auth_types"] = "error.GAIERROR"
 				self.q.task_done()
 				continue
-			except ConnectionRefusedError as err:
+			except ConnectionRefusedError:
 				s.close()
 				self.data[host[0]]["auth_types"] = "error.REFUSED"
 				self.q.task_done()
 				continue
-			except OSError as err:
+			except OSError:
 				s.close()
 				self.data[host[0]]["auth_types"] = "error.ROUTE"
 				self.q.task_done()
 				continue
-			except ValueError as err:
+			except ValueError:
 				s.close()
 				self.data[host[0]]["auth_types"] = "error.LENGTH"
 				self.q.task_done()
@@ -85,16 +85,28 @@ class SSHAuthTypes:
 			try:
 				t = paramiko.Transport(s)
 				t.connect()
-			except (paramiko.ssh_exception.SSHException, EOFError) as err:
+			except (paramiko.ssh_exception.SSHException, EOFError):
 				s.close()
 				t.close()
 				self.data[host[0]]["auth_types"] = "error.INVALID_BANNER"
 				self.q.task_done()
 				continue
-			except ConnectionAbortedError as err:
+			except ConnectionAbortedError:
 				s.close()
 				t.close()
 				self.data[host[0]]["auth_types"] = "error.ABORTED"
+				self.q.task_done()
+				continue
+			except ConnectionResetError:
+				s.close()
+				t.close()
+				self.data[host[0]]["auth_types"] = "error.RESET"
+				self.q.task_done()
+				continue
+			except ValueError:
+				s.close()
+				t.close()
+				self.data[host[0]]["auth_types"] = "error.LENGTH"
 				self.q.task_done()
 				continue
 
@@ -103,11 +115,11 @@ class SSHAuthTypes:
 				t.auth_none('')
 			except paramiko.BadAuthenticationType as err:
 				self.data[host[0]]["auth_types"] = err.allowed_types
-			except (ConnectionResetError, ConnectionAbortedError) as err:
+			except (ConnectionResetError, ConnectionAbortedError):
 				self.data[host[0]]["auth_types"] = "error.ABORTED"
-			except paramiko.ssh_exception.AuthenticationException as err:
+			except paramiko.ssh_exception.AuthenticationException:
 				self.data[host[0]]["auth_types"] = "error.EXCEPTION"
-			except EOFError as err:
+			except EOFError:
 				self.data[host[0]]["auth_types"] = "error.EOF"
 			
 			s.close()
