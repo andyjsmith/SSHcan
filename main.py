@@ -10,6 +10,7 @@ import json
 import socket
 import argparse
 import progressbar
+import geoip2.database
 
 # Command line arguments
 parser = argparse.ArgumentParser(description="SSHcan IPv4 address space scanner and statistics")
@@ -30,6 +31,14 @@ data = parser.parse()
 print("Resolving IP addresses")
 host_resolver = SSHHostResolver(NUM_THREADS * 10, data)
 data = host_resolver.run()
+
+# Get location of IP addresses
+print("Searching geoip database")
+geoip = geoip2.database.Reader("GeoLite2-City.mmdb")
+for host, props in data.items():
+	location = geoip.city(host).location
+	data[host]["latitude"] = location.latitude
+	data[host]["longitude"] = location.longitude
 
 # Get ciphers
 print("Parsing SSH ciphers")
