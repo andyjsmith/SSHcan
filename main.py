@@ -83,7 +83,7 @@ i = 0
 sshcve = SSHCVE("SSH_CVE.csv")
 for host, props in data.items():
 	if props["parsed_banner"]["version"] is not None:
-		data[host]["cve"] = sshcve.get_cve(SSHVersion(props["parsed_banner"]["version"]))
+		data[host]["cve"] = sshcve.get_cve(SSHVersion(props["parsed_banner"]["version_string"]))
 	i += 1
 	if i % 100 == 0: cve_progress.update(i)
 

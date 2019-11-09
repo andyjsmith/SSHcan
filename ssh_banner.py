@@ -122,7 +122,7 @@ class SSHBanner:
 
 	def to_dict(self):
 		return {
-			"version_string": self.version_string,
+			"version_string": self.version_number,
 			"os_string": self.os_string,
 			"operating_system": self.operating_system,
 			"os_version": self.os_version,
