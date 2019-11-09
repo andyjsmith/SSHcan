@@ -67,6 +67,10 @@ class SSHAuthTypes:
 				self.data[host[0]]["auth_types"] = "error.REFUSED"
 				self.q.task_done()
 				continue
+			except OSError as err:
+				self.data[host[0]]["auth_types"] = "error.ROUTE"
+				self.q.task_done()
+				continue
 			
 			# Connect with SSH over socket
 			try:
