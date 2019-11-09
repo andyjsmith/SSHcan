@@ -24,6 +24,7 @@ args = parser.parse_args()
 NUM_THREADS = args.threads
 
 start_time = datetime.now()
+print(f"Started at {start_time}")
 
 # Parse Masscan output file
 print("1/7: Parsing Masscan output")
