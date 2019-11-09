@@ -79,7 +79,7 @@ class SSHAuthTypes:
 			# Connect with SSH over socket
 			try:
 				t = paramiko.Transport(s)
-				t.connect()
+				t.connect(timeout=3, banner_timeout=3, auth_timeout=3)
 			except (paramiko.ssh_exception.SSHException, EOFError) as err:
 				self.data[host[0]]["auth_types"] = "error.INVALID_BANNER"
 				self.q.task_done()
