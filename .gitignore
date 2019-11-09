@@ -138,5 +138,5 @@ dmypy.json
 *.pcap
 *.pcapng
 *.xlsx
-masscanoutput.txt
+*.txt
 *.mmdb
