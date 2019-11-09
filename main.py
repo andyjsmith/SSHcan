@@ -37,8 +37,8 @@ print("Searching geoip database")
 geoip = geoip2.database.Reader("GeoLite2-City.mmdb")
 for host, props in data.items():
 	location = geoip.city(host).location
-	data[host]["latitude"] = location.latitude
-	data[host]["longitude"] = location.longitude
+	data[host]["lat"] = location.latitude
+	data[host]["lon"] = location.longitude
 
 # Get ciphers
 print("Parsing SSH ciphers")
@@ -69,8 +69,8 @@ cve_progress.update(0)
 i = 0
 sshcve = SSHCVE("SSH_CVE.csv")
 for host, props in data.items():
-	if props["parsed_banner"]["version_number"] is not None:
-		data[host]["cve"] = sshcve.get_cve(SSHVersion(props["parsed_banner"]["version_number"]))
+	if props["parsed_banner"]["version"] is not None:
+		data[host]["cve"] = sshcve.get_cve(SSHVersion(props["parsed_banner"]["version"]))
 	i += 1
 	if i % 100 == 0: cve_progress.update(i)
 

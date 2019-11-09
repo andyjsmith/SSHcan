@@ -75,12 +75,8 @@ class SSHCiphers:
 
 	def to_dict(self):
 		return {
-			"kex": self.kex,
 			"weak_kex": self.weak_kex,
-			"macs": self.macs,
 			"weak_macs": self.weak_macs,
-			"hka": self.hka,
 			"weak_hka": self.weak_hka,
-			"ciphers": self.ciphers,
 			"weak_ciphers": self.weak_ciphers
 		}

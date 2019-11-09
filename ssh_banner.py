@@ -67,44 +67,8 @@ class SSHBanner:
 		return self.version[index + 1:]
 
 	@property
-	def version_major(self):
-		if not self.is_openssh:
-			return None
-
-		if self.version_number is None:
-			return None
-
-		return SSHVersion(self.version_number).major
-
-	@property
-	def version_minor(self):
-		if not self.is_openssh:
-			return None
-
-		if self.version_number is None:
-			return None
-
-		return SSHVersion(self.version_number).minor
-
-	@property
-	def version_revision(self):
-		if not self.is_openssh:
-			return None
-
-		if self.version_number is None:
-			return None
-
-		return SSHVersion(self.version_number).revision
-
-	@property
-	def version_patch(self):
-		if not self.is_openssh:
-			return None
-
-		if self.version_number is None:
-			return None
-
-		return SSHVersion(self.version_number).patch
+	def version_parsed(self):
+		return SSHVersion(self.version_number).version
 
 	@property
 	def is_openssh(self):
@@ -162,12 +126,7 @@ class SSHBanner:
 			"os_version": self.os_version,
 			"ssh_version": self.ssh_version,
 			"software": self.software,
-			"version": self.version,
-			"version_number": self.version_number,
-			"version_major": self.version_major,
-			"version_minor": self.version_minor,
-			"version_revision": self.version_revision,
-			"version_patch": self.version_patch,
+			"version": self.version_parsed,
 			"is_openssh": self.is_openssh
 		}
 

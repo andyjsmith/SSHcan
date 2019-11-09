@@ -56,15 +56,15 @@ class SSHAuthTypes:
 			try:
 				s.connect(host)
 			except socket.timeout as err:
-				self.data[host[0]]["auth_types"] = "SSHError.CONNECTION_TIMEOUT"
+				self.data[host[0]]["auth_types"] = "error.TIMEOUT"
 				self.q.task_done()
 				continue
 			except socket.gaierror as err:
-				self.data[host[0]]["auth_types"] = "SSHError.GAIERROR"
+				self.data[host[0]]["auth_types"] = "error.GAIERROR"
 				self.q.task_done()
 				continue
 			except ConnectionRefusedError as err:
-				self.data[host[0]]["auth_types"] = "SSHError.CONNECTION_REFUSED"
+				self.data[host[0]]["auth_types"] = "error.REFUSED"
 				self.q.task_done()
 				continue
 			
@@ -73,11 +73,11 @@ class SSHAuthTypes:
 				t = paramiko.Transport(s)
 				t.connect()
 			except (paramiko.ssh_exception.SSHException, EOFError) as err:
-				self.data[host[0]]["auth_types"] = "SSHError.INVALID_BANNER"
+				self.data[host[0]]["auth_types"] = "error.INVALID_BANNER"
 				self.q.task_done()
 				continue
 			except ConnectionAbortedError as err:
-				self.data[host[0]]["auth_types"] = "SSHError.CONNECTION_ABORTED"
+				self.data[host[0]]["auth_types"] = "error.ABORTED"
 				self.q.task_done()
 				continue
 
@@ -87,9 +87,9 @@ class SSHAuthTypes:
 			except paramiko.BadAuthenticationType as err:
 				self.data[host[0]]["auth_types"] = err.allowed_types
 			except (ConnectionResetError, ConnectionAbortedError) as err:
-				self.data[host[0]]["auth_types"] = "SSHError.CONNECTION_EXCEPTION"
+				self.data[host[0]]["auth_types"] = "error.ABORTED"
 			except paramiko.ssh_exception.AuthenticationException as err:
-				self.data[host[0]]["auth_types"] = "SSHError.AUTHENTICATION_EXCEPTION"
+				self.data[host[0]]["auth_types"] = "error.EXCEPTION"
 			
 			self.q.task_done()
 			if (self.count - self.q.qsize()) % 10 == 0:
