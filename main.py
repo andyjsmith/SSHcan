@@ -35,10 +35,20 @@ data = host_resolver.run()
 # Get location of IP addresses
 print("Searching geoip database")
 geoip = geoip2.database.Reader("GeoLite2-City.mmdb")
+geoip_progress = progressbar.ProgressBar(max_value=len(data))
+geoip_progress.update(0)
+i = 0
 for host, props in data.items():
-	location = geoip.city(host).location
-	data[host]["lat"] = location.latitude
-	data[host]["lon"] = location.longitude
+	i += 1
+	try:
+		location = geoip.city(host).location
+		data[host]["lat"] = location.latitude
+		data[host]["lon"] = location.longitude
+	except geoip2.errors.AddressNotFoundError as err:
+		data[host]["lat"] = None
+		data[host]["lon"] = None
+	geoip_progress.update(i)
+geoip_progress.finish()
 
 # Get ciphers
 print("Parsing SSH ciphers")
