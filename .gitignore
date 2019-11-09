@@ -133,6 +133,15 @@ dmypy.json
 !.vscode/extensions.json
 *.code-workspace
 
+# Python venv
+__pycache__/
+bin/
+include/
+lib/
+lib64/
+lib64
+share/
+pyvenv.cfg
 
 # Custom
 *.pcap
