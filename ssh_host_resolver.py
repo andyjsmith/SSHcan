@@ -45,5 +45,4 @@ class SSHHostResolver:
 			self.data[host]["hostname"] = socket.getfqdn(host)
 			
 			self.q.task_done()
-			if (self.count - self.q.qsize()) % 100 == 0:
-				self.progress.update(self.count - self.q.qsize())
+			self.progress.update(self.count - self.q.qsize())
