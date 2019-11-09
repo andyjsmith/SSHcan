@@ -68,6 +68,8 @@ class SSHBanner:
 
 	@property
 	def version_parsed(self):
+		if self.version_number is None:
+			return None
 		return SSHVersion(self.version_number).version
 
 	@property
