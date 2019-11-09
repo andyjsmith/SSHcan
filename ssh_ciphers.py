@@ -33,7 +33,10 @@ class SSHCiphers:
 			banner = conn.recv(50).split(b'\n')[0]
 			conn.send(b'SSH-2.0-OpenSSH_7.9p1\r\n')
 			ciphers = conn.recv(2048)
-		except ConnectionResetError as err:
+		except ConnectionResetError:
+			conn.close()
+			return
+		except BrokenPipeError:
 			conn.close()
 			return
 		
