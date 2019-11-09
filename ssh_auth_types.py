@@ -56,22 +56,27 @@ class SSHAuthTypes:
 			try:
 				s.connect(host)
 			except socket.timeout as err:
+				s.close()
 				self.data[host[0]]["auth_types"] = "error.TIMEOUT"
 				self.q.task_done()
 				continue
 			except socket.gaierror as err:
+				s.close()
 				self.data[host[0]]["auth_types"] = "error.GAIERROR"
 				self.q.task_done()
 				continue
 			except ConnectionRefusedError as err:
+				s.close()
 				self.data[host[0]]["auth_types"] = "error.REFUSED"
 				self.q.task_done()
 				continue
 			except OSError as err:
+				s.close()
 				self.data[host[0]]["auth_types"] = "error.ROUTE"
 				self.q.task_done()
 				continue
 			except ValueError as err:
+				s.close()
 				self.data[host[0]]["auth_types"] = "error.LENGTH"
 				self.q.task_done()
 				continue
@@ -81,10 +86,14 @@ class SSHAuthTypes:
 				t = paramiko.Transport(s)
 				t.connect()
 			except (paramiko.ssh_exception.SSHException, EOFError) as err:
+				s.close()
+				t.close()
 				self.data[host[0]]["auth_types"] = "error.INVALID_BANNER"
 				self.q.task_done()
 				continue
 			except ConnectionAbortedError as err:
+				s.close()
+				t.close()
 				self.data[host[0]]["auth_types"] = "error.ABORTED"
 				self.q.task_done()
 				continue
@@ -101,5 +110,7 @@ class SSHAuthTypes:
 			except EOFError as err:
 				self.data[host[0]]["auth_types"] = "error.EOF"
 			
+			s.close()
+			t.close()
 			self.q.task_done()
 			self.progress.update(self.count - self.q.qsize())
