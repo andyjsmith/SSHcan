@@ -71,6 +71,10 @@ class SSHAuthTypes:
 				self.data[host[0]]["auth_types"] = "error.ROUTE"
 				self.q.task_done()
 				continue
+			except ValueError as err:
+				self.data[host[0]]["auth_types"] = "error.LENGTH"
+				self.q.task_done()
+				continue
 			
 			# Connect with SSH over socket
 			try:
@@ -94,7 +98,8 @@ class SSHAuthTypes:
 				self.data[host[0]]["auth_types"] = "error.ABORTED"
 			except paramiko.ssh_exception.AuthenticationException as err:
 				self.data[host[0]]["auth_types"] = "error.EXCEPTION"
+			except EOFError as err:
+				self.data[host[0]]["auth_types"] = "error.EOF"
 			
 			self.q.task_done()
-			if (self.count - self.q.qsize()) % 10 == 0:
-				self.progress.update(self.count - self.q.qsize())
+			self.progress.update(self.count - self.q.qsize())
