@@ -81,7 +81,7 @@ class SSHAuthTypes:
 			# Connect with SSH over socket
 			try:
 				t = paramiko.Transport(s)
-				t.connect()
+				t.connect(timeout=10)
 			except (paramiko.ssh_exception.SSHException, EOFError):
 				s.close()
 				t.close()
