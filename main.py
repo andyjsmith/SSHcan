@@ -11,6 +11,7 @@ import socket
 import argparse
 import progressbar
 import geoip2.database
+from datetime import datetime
 
 # Command line arguments
 parser = argparse.ArgumentParser(description="SSHcan IPv4 address space scanner and statistics")
@@ -22,18 +23,20 @@ args = parser.parse_args()
 
 NUM_THREADS = args.threads
 
+start_time = datetime.now()
+
 # Parse Masscan output file
-print("Parsing Masscan output")
+print("1/7: Parsing Masscan output")
 parser = SSHMasscanParser(args.input_file)
 data = parser.parse()
 
 # Resolve IP addresses
-print("Resolving IP addresses")
+print("2/7: Resolving IP addresses")
 host_resolver = SSHHostResolver(NUM_THREADS * 10, data)
 data = host_resolver.run()
 
 # Get location of IP addresses
-print("Searching geoip database")
+print("3/7: Searching geoip database")
 geoip = geoip2.database.Reader("GeoLite2-City.mmdb")
 geoip_progress = progressbar.ProgressBar(max_value=len(data))
 geoip_progress.update(0)
@@ -51,17 +54,17 @@ for host, props in data.items():
 geoip_progress.finish()
 
 # Get ciphers
-print("Parsing SSH ciphers")
+print("4/7: Parsing SSH ciphers")
 threaded_ciphers = SSHCiphersThreaded(NUM_THREADS, data)
 data = threaded_ciphers.run()
 
 # Get auth types
-print("Getting auth types")
+print("5/7: Getting auth types")
 auth_types_parallel = SSHAuthTypes(NUM_THREADS, data)
 data = auth_types_parallel.run()
 
 # Parse banner
-print("Parsing banners")
+print("6/7: Parsing banners")
 banner_progress = progressbar.ProgressBar(max_value=len(data))
 banner_progress.update(0)
 i = 0
@@ -73,7 +76,7 @@ for host, props in data.items():
 banner_progress.finish()
 
 # Get CVEs
-print("Getting CVEs")
+print("7/7: Getting CVEs")
 cve_progress = progressbar.ProgressBar(max_value=len(data))
 cve_progress.update(0)
 i = 0
@@ -88,3 +91,6 @@ cve_progress.finish()
 
 # Save to output file
 json.dump(data, open(args.output_file, "w"))
+
+print("Script finished in the following time:")
+print(datetime.now() - start_time)
