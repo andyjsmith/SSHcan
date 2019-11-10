@@ -77,6 +77,11 @@ class SSHAuthTypes:
 				self.data[host[0]]["auth_types"] = "error.LENGTH"
 				self.q.task_done()
 				continue
+			except:
+				s.close()
+				self.data[host[0]]["auth_types"] = "error"
+				self.q.task_done()
+				continue
 			
 			# Connect with SSH over socket
 			try:
@@ -106,6 +111,12 @@ class SSHAuthTypes:
 				self.data[host[0]]["auth_types"] = "error.LENGTH"
 				self.q.task_done()
 				continue
+			except:
+				s.close()
+				t.close()
+				self.data[host[0]]["auth_types"] = "error"
+				self.q.task_done()
+				continue
 
 			# Try authentication to get allowed SSH auth types
 			try:
@@ -120,6 +131,8 @@ class SSHAuthTypes:
 				self.data[host[0]]["auth_types"] = "error.EOF"
 			except paramiko.ssh_exception.SSHException:
 				self.data[host[0]]["auth_types"] = "error.TIMEOUT"
+			except:
+				self.data[host[0]]["auth_types"] = "error"
 			
 			s.close()
 			t.close()
