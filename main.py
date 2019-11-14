@@ -14,10 +14,12 @@ import geoip2.database
 from datetime import datetime
 
 # Command line arguments
-parser = argparse.ArgumentParser(description="SSHcan IPv4 address space scanner and statistics")
+parser = argparse.ArgumentParser(
+	description="SSHcan IPv4 address space scanner and statistics")
 parser.add_argument("input_file", help="Masscan output file to read", type=str)
 parser.add_argument("output_file", help="File to save JSON output", type=str)
-parser.add_argument("--threads", help="Number of threads to use for parsing (x10 for IP resolution)", default=256, type=int)
+parser.add_argument(
+	"--threads", help="Number of threads to use for parsing (x10 for IP resolution)", default=256, type=int)
 
 args = parser.parse_args()
 
@@ -45,12 +47,16 @@ i = 0
 for host, props in data.items():
 	i += 1
 	try:
-		location = geoip.city(host).location
-		data[host]["lat"] = location.latitude
-		data[host]["lon"] = location.longitude
+		geo = geoip.city(host)
+		data[host]["lat"] = geo.location.latitude
+		data[host]["lon"] = geo.location.longitude
+		data[host]["country"] = geo.country.name
+		data[host]["subdiv"] = geo.subdivisions.most_specific.name
 	except geoip2.errors.AddressNotFoundError as err:
 		data[host]["lat"] = None
 		data[host]["lon"] = None
+		data[host]["country"] = None
+		data[host]["subdiv"] = None
 	geoip_progress.update(i)
 geoip_progress.finish()
 
@@ -72,7 +78,8 @@ i = 0
 for host, props in data.items():
 	data[host]["parsed_banner"] = SSHBanner(props["banner"]).to_dict()
 	i += 1
-	if i % 1000 == 0: banner_progress.update(i)
+	if i % 1000 == 0:
+		banner_progress.update(i)
 
 banner_progress.finish()
 
@@ -84,9 +91,11 @@ i = 0
 sshcve = SSHCVE("SSH_CVE.csv")
 for host, props in data.items():
 	if props["parsed_banner"]["version"] is not None:
-		data[host]["cve"] = sshcve.get_cve(SSHVersion(props["parsed_banner"]["version_string"]))
+		data[host]["cve"] = sshcve.get_cve(
+			SSHVersion(props["parsed_banner"]["version_string"]))
 	i += 1
-	if i % 100 == 0: cve_progress.update(i)
+	if i % 100 == 0:
+		cve_progress.update(i)
 
 cve_progress.finish()
 
